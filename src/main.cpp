@@ -23,17 +23,17 @@ void setup()
 
   for (int i = 0; i < colNum; i++)
   {
-    pinMode(colPin[i], INPUT);
+    pinMode(colPin[i], INPUT_PULLUP);
   }
 
   for (int i = 0; i < rowNum; i++)
   {
     for (int j = 0; j < colNum; j++)
     {
-      currentState[i][j] = LOW;
-      beforeState[i][j] = LOW;
+      currentState[i][j] = HIGH;
+      beforeState[i][j] = HIGH;
     }
-    digitalWrite(rowPin[i], LOW);
+    digitalWrite(rowPin[i], HIGH);
   }
 
   Serial.begin(9600);
@@ -44,7 +44,7 @@ void loop()
 {
   for (int i = 0; i < rowNum; i++)
   {
-    digitalWrite(rowPin[i], HIGH);
+    digitalWrite(rowPin[i], LOW);
 
     for (int j = 0; j < colNum; j++)
     {
@@ -59,7 +59,7 @@ void loop()
         Serial.print(j);
         Serial.print(")");
 
-        if (currentState[i][j] == HIGH)
+        if (currentState[i][j] == LOW)
         {
           Serial.println(" Push!");
           Keyboard.press(keyMap[i][j]);
@@ -72,6 +72,6 @@ void loop()
         beforeState[i][j] = currentState[i][j];
       }
     }
-    digitalWrite(rowPin[i], LOW);
+    digitalWrite(rowPin[i], HIGH);
   }
 }
