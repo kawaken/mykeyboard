@@ -1,43 +1,50 @@
 #include "Arduino.h"
 #include "Keyboard.h"
 
-#define INPUT_PIN 3
+const int keyNum = 2;
 
-bool prevStatus = LOW;
+const int inputPin[keyNum] = {3, 4};
+const byte keyMap[keyNum] = {0x61, 0x62};
+
+bool currentState[keyNum];
+bool beforeState[keyNum];
 
 void setup()
 {
-    pinMode(INPUT_PIN, INPUT);
-    pinMode(LED_BUILTIN, OUTPUT);
+  for (int i = 0; i < keyNum; i++)
+  {
+    pinMode(inputPin[i], INPUT);
+    currentState[i] = LOW;
+    beforeState[i] = LOW;
+  }
 
-    Keyboard.begin();
-
-    Serial.begin(9600);
+  Serial.begin(9600);
+  Keyboard.begin();
 }
 
 void loop()
 {
-    bool status = digitalRead(INPUT_PIN);
-    if (prevStatus == status)
+  for (int i = 0; i < keyNum; i++)
+  {
+    currentState[i] = digitalRead(inputPin[i]);
+
+    if (currentState[i] != beforeState[i])
     {
-        return;
+      Serial.print("key");
+      Serial.print(i);
+
+      if (currentState[i] == HIGH)
+      {
+        Serial.println("\tPush!");
+        Keyboard.press(keyMap[i]);
+      }
+      else
+      {
+        Serial.println("\tRelease!");
+        Keyboard.release(keyMap[i]);
+      }
+
+      beforeState[i] = currentState[i];
     }
-
-    prevStatus = status;
-
-    switch (status)
-    {
-    case HIGH:
-        digitalWrite(LED_BUILTIN, HIGH);
-        Keyboard.press(0x61);
-        Serial.println("Press");
-
-        break;
-    case LOW:
-        digitalWrite(LED_BUILTIN, LOW);
-        Keyboard.release(0x61);
-        Serial.println("Release");
-
-        break;
-    }
+  }
 }
